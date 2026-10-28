@@ -1,0 +1,8 @@
+{
+  "name": "nivea-tickets-dashboard",
+  "version": "1.0.0",
+  "description": "Nivea Scan & Win Aquarabia Tickets Dashboard",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}

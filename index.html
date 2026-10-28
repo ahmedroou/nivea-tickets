@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a1628">
+  <title>تذاكر أكوارابيا القدية | NIVEA Scan & Win</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a1628; --surface: #111d33; --card: #172340; --card-hover: #1d2d50;
+      --border: #223056; --border-light: #2a3a66;
+      --text: #e8ecf5; --text-muted: #8a97b8; --text-dim: #5c6a8a;
+      --accent: #3b82f6; --accent-hover: #60a5fa; --accent-bg: rgba(59,130,246,.08);
+      --green: #22c55e; --green-bg: rgba(34,197,94,.1); --green-border: rgba(34,197,94,.25);
+      --amber: #f59e0b; --amber-bg: rgba(245,158,11,.1); --amber-border: rgba(245,158,11,.25);
+      --purple: #a855f7; --purple-bg: rgba(168,85,247,.1); --purple-border: rgba(168,85,247,.25);
+      --red: #ef4444; --red-bg: rgba(239,68,68,.1);
+      --radius: 10px; --radius-sm: 6px;
+      --shadow: 0 1px 3px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.2);
+      --font: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+    }
+    html { background: var(--bg); color: var(--text); font-family: var(--font); scroll-behavior: smooth; }
+    body { min-height: 100dvh; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); overflow-x: hidden; }
+
+    /* Top Bar */
+    .top-bar {
+      position: sticky; top: 0; z-index: 100;
+      background: linear-gradient(135deg, var(--surface) 0%, #0e1a30 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 14px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      backdrop-filter: blur(12px);
+    }
+    .top-bar .back-link {
+      color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; gap: 4px; white-space: nowrap;
+    }
+    .top-bar .back-link svg { width: 16px; height: 16px; transform: rotate(180deg); }
+    .top-bar h1 { font-size: 15px; font-weight: 800; text-align: center; white-space: nowrap; }
+
+    .drawer-trigger-btn {
+      background: var(--amber-bg); border: 1px solid var(--amber-border); color: var(--amber);
+      font-size: 11px; font-weight: 800; font-family: var(--font);
+      padding: 6px 12px; border-radius: 99px; cursor: pointer;
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+      transition: all .2s;
+    }
+    .drawer-trigger-btn:hover, .drawer-trigger-btn:active {
+      background: var(--amber); color: #000; border-color: var(--amber);
+    }
+    .pulse-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--amber);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(1.3); } }
+
+    /* Navigation View Tabs (المتاحة vs المستعملة) */
+    .view-tabs-container {
+      padding: 8px 12px 4px;
+    }
+    .view-tabs {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 3px; display: flex; gap: 4px;
+    }
+    .view-tab {
+      flex: 1; padding: 8px 10px; border-radius: var(--radius-sm); border: none;
+      background: transparent; color: var(--text-muted); font-size: 12px; font-weight: 700;
+      font-family: var(--font); cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .view-tab.active {
+      background: var(--card-hover); color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.3);
+    }
+    .view-tab.active.tab-available { color: var(--green); border-bottom: 2px solid var(--green); }
+    .view-tab.active.tab-used { color: var(--purple); border-bottom: 2px solid var(--purple); }
+    .tab-badge {
+      font-size: 10px; padding: 1px 6px; border-radius: 99px; font-weight: 800;
+    }
+    .tab-available .tab-badge { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .tab-used .tab-badge { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+
+    /* Stats Strip (Compact) */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 8px 12px 4px; }
+    .stat-box {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 8px 6px; text-align: center; cursor: pointer; transition: transform .15s, border-color .15s;
+    }
+    .stat-box:active { transform: scale(.98); }
+    .stat-box.available { border-color: var(--green-border); background: var(--green-bg); }
+    .stat-box.used { border-color: var(--purple-border); background: var(--purple-bg); }
+    .stat-box.pending { border-color: var(--amber-border); background: var(--amber-bg); }
+    .stat-box strong { display: block; font-size: 20px; font-weight: 900; line-height: 1.15; }
+    .stat-box.available strong { color: var(--green); }
+    .stat-box.used strong { color: var(--purple); }
+    .stat-box.pending strong { color: var(--amber); }
+    .stat-box span { font-size: 10px; color: var(--text-muted); font-weight: 700; white-space: nowrap; }
+
+    /* Search */
+    .search-bar {
+      padding: 6px 12px; position: sticky; top: 51px; z-index: 50;
+      background: var(--bg);
+    }
+    .search-bar input {
+      width: 100%; background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 8px 12px 8px 36px;
+      color: var(--text); font-size: 12px; font-family: var(--font);
+      outline: none; transition: border-color .2s;
+    }
+    .search-bar input:focus { border-color: var(--accent); }
+    .search-bar input::placeholder { color: var(--text-dim); }
+    .search-bar .search-icon {
+      position: absolute; left: auto; right: 24px; top: 50%; transform: translateY(-50%);
+      color: var(--text-dim); pointer-events: none;
+    }
+    .search-bar .search-icon svg { width: 15px; height: 15px; }
+
+    /* Filters */
+    .filters { display: flex; gap: 6px; padding: 2px 12px 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      border: 1px solid var(--border); background: var(--card); color: var(--text-muted);
+      border-radius: 99px; padding: 4px 10px; font-size: 11px; font-weight: 700;
+      font-family: var(--font); cursor: pointer; white-space: nowrap;
+      transition: all .2s;
+    }
+    .filter-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .filter-pill b { font-weight: 800; margin-right: 3px; }
+
+    /* Ticket Cards Grid (Compact & Mobile First) */
+    .cards { padding: 0 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+
+    .ticket-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 9px 10px; display: flex; align-items: center; gap: 8px;
+      cursor: pointer; transition: background .15s, border-color .15s, transform .2s, opacity .2s;
+      position: relative;
+    }
+    .ticket-card:active, .ticket-card:hover { background: var(--card-hover); border-color: var(--border-light); }
+    .ticket-card.available { border-right: 3px solid var(--green); }
+    .ticket-card.used-card { border-right: 3px solid var(--purple); opacity: .85; }
+    .ticket-card.pending-card { border-right: 3px solid var(--amber); }
+
+    .ticket-card .rank-badge {
+      width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; flex-shrink: 0;
+    }
+    .ticket-card.available .rank-badge { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .ticket-card.used-card .rank-badge { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+    .ticket-card.pending-card .rank-badge { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+
+    .ticket-card .info { flex: 1; min-width: 0; }
+    .ticket-card .info .name {
+      font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .ticket-card .info .meta { font-size: 10px; color: var(--text-muted); display: flex; gap: 6px; align-items: center; margin-top: 2px; }
+    .ticket-card .info .meta .city { max-width: 65px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .draw-badge {
+      font-size: 9px; padding: 1px 5px; border-radius: 4px;
+      background: rgba(59,130,246,.12); color: var(--accent); font-weight: 800; white-space: nowrap;
+    }
+
+    /* Actions in Card */
+    .ticket-card .card-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+    .btn-use-ticket {
+      background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border);
+      font-size: 10.5px; font-weight: 800; font-family: var(--font);
+      padding: 5px 8px; border-radius: var(--radius-sm); cursor: pointer;
+      display: flex; align-items: center; gap: 4px; white-space: nowrap;
+      transition: all .15s;
+    }
+    .btn-use-ticket:hover, .btn-use-ticket:active {
+      background: var(--purple); color: #fff;
+    }
+
+    .btn-restore-ticket {
+      background: rgba(59,130,246,.1); color: var(--accent); border: 1px solid rgba(59,130,246,.25);
+      font-size: 10.5px; font-weight: 800; font-family: var(--font);
+      padding: 5px 8px; border-radius: var(--radius-sm); cursor: pointer;
+      display: flex; align-items: center; gap: 4px; white-space: nowrap;
+      transition: all .15s;
+    }
+    .btn-restore-ticket:hover, .btn-restore-ticket:active {
+      background: var(--accent); color: #fff;
+    }
+
+    .dl-btn {
+      width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--green-border);
+      background: var(--green-bg); color: var(--green);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s; flex-shrink: 0;
+    }
+    .dl-btn:hover, .dl-btn:active { background: var(--green); color: #fff; }
+    .dl-btn svg { width: 13px; height: 13px; }
+
+    /* Side Drawer for Pending Tickets (القائمة الجانبية) */
+    .drawer-overlay {
+      position: fixed; inset: 0; z-index: 250;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(5px);
+      display: none; align-items: stretch; justify-content: flex-start;
+      opacity: 0; transition: opacity .25s ease;
+    }
+    .drawer-overlay.open { display: flex; opacity: 1; }
+
+    .side-drawer {
+      background: var(--surface); width: 100%; max-width: 440px; height: 100dvh;
+      display: flex; flex-direction: column;
+      box-shadow: -5px 0 25px rgba(0,0,0,.5);
+      transform: translateX(-100%); transition: transform .28s cubic-bezier(.4, 0, .2, 1);
+    }
+    .drawer-overlay.open .side-drawer { transform: translateX(0); }
+
+    .drawer-header {
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--card) 0%, #101c36 100%);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .drawer-header .title-group h2 { font-size: 15px; font-weight: 800; color: var(--amber); display: flex; align-items: center; gap: 6px; }
+    .drawer-header .title-group .sub { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+    .drawer-close-btn {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--card-hover);
+      border: 1px solid var(--border); color: var(--text); font-size: 16px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+
+    .drawer-search-bar { padding: 10px 14px 6px; }
+    .drawer-search-bar input {
+      width: 100%; background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 8px 12px;
+      color: var(--text); font-size: 12px; font-family: var(--font); outline: none;
+    }
+    .drawer-filters { display: flex; gap: 6px; padding: 4px 14px 8px; }
+    .drawer-cards {
+      flex: 1; overflow-y: auto; padding: 6px 14px 20px;
+      display: flex; flex-direction: column; gap: 6px; -webkit-overflow-scrolling: touch;
+    }
+
+    /* Detail Modal & Confirmation Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,.75);
+      backdrop-filter: blur(4px); display: none; align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: var(--surface); border-radius: 16px 16px 0 0; width: 100%; max-width: 480px;
+      max-height: 88dvh; overflow-y: auto; padding: 0 16px 20px;
+      animation: slideUp .22s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } }
+    .modal-handle {
+      width: 36px; height: 4px; background: var(--border-light); border-radius: 2px;
+      margin: 10px auto 12px;
+    }
+    .modal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .modal-header .rank-circle {
+      width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 900; flex-shrink: 0;
+    }
+    .modal-header .modal-title { flex: 1; min-width: 0; }
+    .modal-header .modal-title h2 { font-size: 15px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .modal-header .modal-title .sub { font-size: 11px; color: var(--text-muted); }
+
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+    .detail-item {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 7px 9px;
+    }
+    .detail-item.full { grid-column: 1 / -1; }
+    .detail-item label { font-size: 9px; color: var(--text-dim); font-weight: 600; display: block; margin-bottom: 2px; }
+    .detail-item value { font-size: 11.5px; font-weight: 600; display: block; word-break: break-all; direction: ltr; text-align: right; }
+
+    .modal-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+    .modal-actions .action-row { display: flex; gap: 6px; }
+    .modal-actions button {
+      flex: 1; padding: 10px; border-radius: var(--radius); border: none;
+      font-size: 12.5px; font-weight: 700; font-family: var(--font); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-download-modal { background: var(--green); color: #fff; }
+    .btn-use-modal { background: var(--purple); color: #fff; }
+    .btn-restore-modal { background: var(--accent); color: #fff; }
+    .btn-close { background: var(--card); color: var(--text-muted); border: 1px solid var(--border) !important; }
+
+    /* Confirm Dialog */
+    .confirm-dialog {
+      background: var(--card); border: 1px solid var(--border-light); border-radius: var(--radius);
+      padding: 16px; margin: 10px 0; text-align: center;
+    }
+    .confirm-dialog h3 { font-size: 14px; font-weight: 800; margin-bottom: 6px; color: var(--purple); }
+    .confirm-dialog p { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-20px);
+      background: var(--surface); border: 1px solid var(--green-border); color: #fff;
+      padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(0,0,0,.5); z-index: 400; opacity: 0; pointer-events: none;
+      transition: all .25s ease; display: flex; align-items: center; gap: 6px;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+
+    /* Empty State */
+    .empty { text-align: center; padding: 36px 16px; color: var(--text-dim); }
+    .empty h3 { font-size: 13.5px; margin-top: 6px; color: var(--text-muted); }
+    .empty p { font-size: 11px; margin-top: 4px; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 36px; color: var(--text-dim); }
+    .spinner { width: 26px; height: 26px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Scroll to top */
+    .scroll-top {
+      position: fixed; bottom: 16px; right: 16px; z-index: 90;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--card); border: 1px solid var(--border); color: var(--text-muted);
+      display: none; align-items: center; justify-content: center; cursor: pointer;
+    }
+    .scroll-top.show { display: flex; }
+
+    /* Desktop constraint */
+    @media (min-width: 600px) {
+      .top-bar, .view-tabs-container, .stats, .search-bar, .filters, .cards {
+        max-width: 520px; margin-left: auto; margin-right: auto;
+      }
+      .side-drawer { border-left: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <a href="/" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 6 6 6-6 6"/></svg>
+      الرئيسية
+    </a>
+    <h1>🎟️ تذاكر القدية</h1>
+    <button class="drawer-trigger-btn" id="open-drawer-btn" title="عرض الحسابات والتذاكر المعلقة">
+      <span class="pulse-dot"></span>
+      <span>المعلقة</span>
+      <b id="btn-pending-count">—</b>
+    </button>
+  </div>
+
+  <!-- Segmented View Tabs: المتاحة للاستخدام vs المستعملة -->
+  <div class="view-tabs-container">
+    <div class="view-tabs">
+      <button class="view-tab tab-available active" id="tab-available-btn" data-view="available">
+        🎟️ المتاحة للاستخدام
+        <span class="tab-badge" id="tab-avail-count">—</span>
+      </button>
+      <button class="view-tab tab-used" id="tab-used-btn" data-view="used">
+        ✔️ المستعملة
+        <span class="tab-badge" id="tab-used-count">0</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Strip -->
+  <div class="stats">
+    <div class="stat-box available" id="stat-avail-box" title="عرض التذاكر المتاحة">
+      <strong id="stat-available">—</strong>
+      <span>مستلمة ومتاحة 🎟️</span>
+    </div>
+    <div class="stat-box used" id="stat-used-box" title="عرض التذاكر المستعملة">
+      <strong id="stat-used">0</strong>
+      <span>مستعملة ✔️</span>
+    </div>
+    <div class="stat-box pending" id="stat-pend-box" title="فتح القائمة الجانبية للمعلقة">
+      <strong id="stat-pending">—</strong>
+      <span>معلقة ⏳</span>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <span class="search-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+    </span>
+    <input type="search" id="search" placeholder="ابحث بالاسم أو الجوال أو رقم السحب أو المدينة...">
+  </div>
+
+  <!-- Filters -->
+  <div class="filters" id="filters">
+    <button class="filter-pill active" data-filter="all">الكل <b id="f-all">—</b></button>
+    <button class="filter-pill" data-filter="draw1">السحب 1 <b id="f-d1">—</b></button>
+    <button class="filter-pill" data-filter="draw2">السحب 2 <b id="f-d2">—</b></button>
+  </div>
+
+  <!-- Main Cards Container (المتاحة والمستعملة فقط - لا توجد معلقة هنا) -->
+  <div class="cards" id="cards-container">
+    <div class="loading"><div class="spinner"></div><p>جاري تحميل التذاكر...</p></div>
+  </div>
+
+  <!-- Side Drawer (القائمة الجانبية للمعلقة فقط) -->
+  <div class="drawer-overlay" id="drawer-overlay">
+    <div class="side-drawer" id="side-drawer">
+      <div class="drawer-header">
+        <div class="title-group">
+          <h2>⏳ الحسابات والتذاكر المعلقة</h2>
+          <div class="sub">الفائزون المؤكدون في انتظار إرسال التذاكر من المنظمين</div>
+        </div>
+        <button class="drawer-close-btn" id="drawer-close-btn" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="drawer-search-bar">
+        <input type="search" id="drawer-search" placeholder="ابحث في الحسابات المعلقة...">
+      </div>
+      <div class="drawer-filters" id="drawer-filters">
+        <button class="filter-pill active" data-dfilter="all">الكل <b id="df-all">—</b></button>
+        <button class="filter-pill" data-dfilter="draw1">سحب 1 <b id="df-d1">—</b></button>
+        <button class="filter-pill" data-dfilter="draw2">سحب 2 <b id="df-d2">—</b></button>
+      </div>
+      <div class="drawer-cards" id="drawer-cards"></div>
+    </div>
+  </div>
+
+  <!-- Detail Modal Sheet -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-sheet" id="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <div class="rank-circle" id="m-rank"></div>
+        <div class="modal-title">
+          <h2 id="m-name"></h2>
+          <div class="sub" id="m-sub"></div>
+        </div>
+      </div>
+      <div class="detail-grid" id="m-details"></div>
+
+      <!-- Confirmation Box inside modal -->
+      <div class="confirm-dialog" id="m-confirm-box" style="display:none;">
+        <h3 id="confirm-title">تأكيد الاستخدام</h3>
+        <p id="confirm-desc">هل أنت متأكد من تأكيد استعمال هذه التذكرة؟ سيتم نقلها مباشرة لقائمة المستعملة ولن تظهر في القائمة المتاحة.</p>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-use-modal" id="confirm-yes-btn">✔️ نعم، تأكيد الاستعمال</button>
+          <button class="btn-close" id="confirm-no-btn">إلغاء</button>
+        </div>
+      </div>
+
+      <div class="modal-actions" id="m-actions">
+        <div class="action-row">
+          <button class="btn-download-modal" id="m-download" style="display:none">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            تحميل PDF
+          </button>
+          <button class="btn-use-modal" id="m-use-btn" style="display:none">
+            ✔️ تم الاستعمال
+          </button>
+          <button class="btn-restore-modal" id="m-restore-btn" style="display:none">
+            ↩️ استرجاع للمتاحة
+          </button>
+        </div>
+        <button class="btn-close" id="m-close">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Scroll to top -->
+  <button class="scroll-top" id="scroll-top" aria-label="أعلى الصفحة">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m18 15-6-6-6 6"/></svg>
+  </button>
+
+<script>
+(function() {
+  'use strict';
+
+  // State
+  let allTickets = [];
+  let usedTicketsMap = new Map(); // key: `${drawNumber}_${drawRank}` -> usedInfo
+  let currentView = 'available'; // 'available' | 'used'
+  let currentFilter = 'all'; // 'all' | 'draw1' | 'draw2'
+  let searchQuery = '';
+  let drawerFilter = 'all';
+  let drawerSearchQuery = '';
+  let activeModalTicket = null;
+
+  const $ = id => document.getElementById(id);
+  const container = $('cards-container');
+  const searchInput = $('search');
+  const modal = $('modal');
+  const drawerOverlay = $('drawer-overlay');
+  const drawerCards = $('drawer-cards');
+  const toast = $('toast');
+
+  function showToast(msg, isSuccess = true) {
+    toast.textContent = msg;
+    toast.style.borderColor = isSuccess ? 'var(--green-border)' : 'var(--amber-border)';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+
+  // Load used tickets from local database API + localStorage fallback
+  async function loadUsedTickets() {
+    // 1. LocalStorage initial fast hydrate
+    try {
+      const cached = localStorage.getItem('batabitoo_used_tickets');
+      if (cached) {
+        const list = JSON.parse(cached);
+        list.forEach(item => usedTicketsMap.set(`${item.drawNumber}_${item.drawRank}`, item));
+      }
+    } catch (_) {}
+
+    // 2. Server API fetch
+    try {
+      const res = await fetch('/api/tickets/used?t=' + Date.now());
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.usedTickets)) {
+          usedTicketsMap.clear();
+          data.usedTickets.forEach(item => usedTicketsMap.set(`${item.drawNumber}_${item.drawRank}`, item));
+          localStorage.setItem('batabitoo_used_tickets', JSON.stringify(data.usedTickets));
+        }
+      }
+    } catch (_) {}
+  }
+
+  // Persist mark used to local database API + localStorage
+  async function saveMarkUsed(drawNumber, drawRank, isUsed, mobile, winnerName) {
+    const key = `${drawNumber}_${drawRank}`;
+    if (isUsed) {
+      usedTicketsMap.set(key, { drawNumber, drawRank, mobile, winnerName, usedAt: new Date().toISOString() });
+    } else {
+      usedTicketsMap.delete(key);
+    }
+
+    // Save to localStorage immediately
+    try {
+      const list = Array.from(usedTicketsMap.values());
+      localStorage.setItem('batabitoo_used_tickets', JSON.stringify(list));
+    } catch (_) {}
+
+    // Save to Server Database
+    try {
+      const res = await fetch('/api/tickets/mark-used', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ drawNumber, drawRank, isUsed, mobile, winnerName })
+      });
+      return res.ok;
+    } catch (e) {
+      console.warn('Server sync error:', e);
+      return false;
+    }
+  }
+
+  // Load all tickets data
+  async function loadData() {
+    try {
+      await loadUsedTickets();
+
+      const res = await fetch('./tickets_data.json?t=' + Date.now());
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      allTickets = data.tickets || [];
+
+      // Re-hydrate used state from map if not in tickets_data
+      allTickets.forEach(t => {
+        const key = `${t.drawNumber || 1}_${t.drawRank}`;
+        if (usedTicketsMap.has(key)) {
+          t.isUsed = true;
+          t.usedAt = usedTicketsMap.get(key).usedAt;
+        } else if (t.isUsed) {
+          usedTicketsMap.set(key, { drawNumber: t.drawNumber || 1, drawRank: t.drawRank, usedAt: t.usedAt });
+        }
+      });
+
+      updateStatsAndBadges();
+      renderMainCards();
+      renderDrawerCards();
+    } catch (e) {
+      container.innerHTML = '<div class="empty"><h3>تعذر تحميل البيانات</h3><p>' + e.message + '</p></div>';
+    }
+  }
+
+  function updateStatsAndBadges() {
+    const receivedTickets = allTickets.filter(t => t.hasTicket);
+    const availableTickets = receivedTickets.filter(t => !t.isUsed);
+    const usedTickets = receivedTickets.filter(t => t.isUsed);
+    const pendingTickets = allTickets.filter(t => !t.hasTicket);
+
+    $('stat-available').textContent = availableTickets.length;
+    $('stat-used').textContent = usedTickets.length;
+    $('stat-pending').textContent = pendingTickets.length;
+    $('btn-pending-count').textContent = pendingTickets.length;
+    $('tab-avail-count').textContent = availableTickets.length;
+    $('tab-used-count').textContent = usedTickets.length;
+
+    // Main filter counters based on current active view
+    const activePool = currentView === 'available' ? availableTickets : usedTickets;
+    $('f-all').textContent = activePool.length;
+    $('f-d1').textContent = activePool.filter(t => (t.drawNumber || 1) === 1).length;
+    $('f-d2').textContent = activePool.filter(t => t.drawNumber === 2).length;
+
+    // Drawer filter counters
+    $('df-all').textContent = pendingTickets.length;
+    $('df-d1').textContent = pendingTickets.filter(t => (t.drawNumber || 1) === 1).length;
+    $('df-d2').textContent = pendingTickets.filter(t => t.drawNumber === 2).length;
+  }
+
+  // Filter pool for Main List (Only received tickets: available or used)
+  function getMainFiltered() {
+    let list = allTickets.filter(t => t.hasTicket);
+    if (currentView === 'available') {
+      list = list.filter(t => !t.isUsed);
+    } else {
+      list = list.filter(t => t.isUsed);
+    }
+
+    if (currentFilter === 'draw1') list = list.filter(t => (t.drawNumber || 1) === 1);
+    else if (currentFilter === 'draw2') list = list.filter(t => t.drawNumber === 2);
+
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(t =>
+        (t.winnerName || '').toLowerCase().includes(q) ||
+        (t.mobile || '').includes(q) ||
+        String(t.drawRank).includes(q) ||
+        (t.city || '').toLowerCase().includes(q) ||
+        (t.ticketMetadata?.bookingId || '').toLowerCase().includes(q) ||
+        (t.ticketMetadata?.ticketCode || '').toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }
+
+  // Render Main Cards
+  function renderMainCards() {
+    const list = getMainFiltered();
+    if (list.length === 0) {
+      if (currentView === 'used') {
+        container.innerHTML = `
+          <div class="empty">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--purple);margin:0 auto 8px;display:block;">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3>لا توجد تذاكر مستعملة بعد</h3>
+            <p>عندما تضغط "استعمال" على أي تذكرة في القائمة المتاحة، ستنتقل إلى هنا لحفظها.</p>
+          </div>`;
+      } else {
+        container.innerHTML = `
+          <div class="empty">
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--text-dim);margin:0 auto 8px;display:block;">
+              <circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>
+            </svg>
+            <h3>لا توجد تذاكر متاحة مطابقة</h3>
+            <p>تأكد من شروط البحث أو الفلتر المختار.</p>
+          </div>`;
+      }
+      return;
+    }
+
+    const dlIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>';
+
+    container.innerHTML = list.map(t => {
+      const drawNum = t.drawNumber || 1;
+      const isUsed = !!t.isUsed;
+      const cls = isUsed ? 'used-card' : 'available';
+      const meta = t.ticketMetadata;
+      const code = meta?.ticketCode ? meta.ticketCode.slice(0, 8) + '…' : '';
+
+      return `<div class="ticket-card ${cls}" id="card-${drawNum}-${t.drawRank}" data-draw="${drawNum}" data-rank="${t.drawRank}">
+        <div class="rank-badge">#${t.drawRank}</div>
+        <div class="info">
+          <div class="name">
+            <span>${t.winnerName || '—'}</span>
+            <span class="draw-badge">سحب ${drawNum}</span>
+            ${isUsed ? '<span style="font-size:9.5px;color:var(--purple);font-weight:800;background:var(--purple-bg);padding:1px 5px;border-radius:3px;">مستعملة</span>' : ''}
+          </div>
+          <div class="meta">
+            <span>${t.mobile || ''}</span>
+            <span class="city">${t.city || ''}</span>
+            ${code ? '<span style="direction:ltr;font-size:9px;color:var(--accent)">' + code + '</span>' : ''}
+          </div>
+        </div>
+        <div class="card-actions">
+          ${t.pdfFileName ? `<button class="dl-btn" data-pdf="${t.pdfFileName}" title="تحميل PDF">${dlIcon}</button>` : ''}
+          ${!isUsed ?
+            `<button class="btn-use-ticket" data-draw="${drawNum}" data-rank="${t.drawRank}" title="تأكيد استعمال التذكرة">استعمال ✔️</button>` :
+            `<button class="btn-restore-ticket" data-draw="${drawNum}" data-rank="${t.drawRank}" title="استرجاع للمتاحة">استرجاع ↩️</button>`
+          }
+        </div>
+      </div>`;
+    }).join('');
+
+    // Attach card click
+    container.querySelectorAll('.ticket-card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        if (e.target.closest('.dl-btn') || e.target.closest('.btn-use-ticket') || e.target.closest('.btn-restore-ticket')) return;
+        const rank = parseInt(this.dataset.rank);
+        const drawNum = parseInt(this.dataset.draw) || 1;
+        openDetail(drawNum, rank);
+      });
+    });
+
+    // Attach Download PDF
+    container.querySelectorAll('.dl-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        downloadPdf(this.dataset.pdf);
+      });
+    });
+
+    // Attach "استعمال" Button
+    container.querySelectorAll('.btn-use-ticket').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const rank = parseInt(this.dataset.rank);
+        const drawNum = parseInt(this.dataset.draw) || 1;
+        promptMarkUsed(drawNum, rank, true);
+      });
+    });
+
+    // Attach "استرجاع" Button
+    container.querySelectorAll('.btn-restore-ticket').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const rank = parseInt(this.dataset.rank);
+        const drawNum = parseInt(this.dataset.draw) || 1;
+        promptMarkUsed(drawNum, rank, false);
+      });
+    });
+  }
+
+  // Filter pool for Drawer (Pending tickets only)
+  function getDrawerFiltered() {
+    let list = allTickets.filter(t => !t.hasTicket);
+    if (drawerFilter === 'draw1') list = list.filter(t => (t.drawNumber || 1) === 1);
+    else if (drawerFilter === 'draw2') list = list.filter(t => t.drawNumber === 2);
+
+    if (drawerSearchQuery) {
+      const q = drawerSearchQuery.toLowerCase();
+      list = list.filter(t =>
+        (t.winnerName || '').toLowerCase().includes(q) ||
+        (t.mobile || '').includes(q) ||
+        String(t.drawRank).includes(q) ||
+        (t.city || '').toLowerCase().includes(q) ||
+        (t.receiptNumber || '').includes(q)
+      );
+    }
+    return list;
+  }
+
+  // Render Drawer Cards (القائمة الجانبية)
+  function renderDrawerCards() {
+    const list = getDrawerFiltered();
+    if (list.length === 0) {
+      drawerCards.innerHTML = '<div class="empty"><h3>لا توجد نتائج في المعلقة</h3></div>';
+      return;
+    }
+
+    drawerCards.innerHTML = list.map(t => {
+      const drawNum = t.drawNumber || 1;
+      return `<div class="ticket-card pending-card" data-draw="${drawNum}" data-rank="${t.drawRank}">
+        <div class="rank-badge">#${t.drawRank}</div>
+        <div class="info">
+          <div class="name">
+            <span>${t.winnerName || '—'}</span>
+            <span class="draw-badge" style="background:var(--amber-bg);color:var(--amber)">سحب ${drawNum}</span>
+          </div>
+          <div class="meta">
+            <span>${t.mobile || ''}</span>
+            <span class="city">${t.city || ''}</span>
+            <span>فاتورة: ${t.receiptNumber || ''}</span>
+          </div>
+        </div>
+        <span style="font-size:9.5px;font-weight:700;color:var(--amber);background:var(--amber-bg);padding:3px 8px;border-radius:99px;border:1px solid var(--amber-border);white-space:nowrap;">
+          معلقة ⏳
+        </span>
+      </div>`;
+    }).join('');
+
+    drawerCards.querySelectorAll('.ticket-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const rank = parseInt(this.dataset.rank);
+        const drawNum = parseInt(this.dataset.draw) || 1;
+        openDetail(drawNum, rank);
+      });
+    });
+  }
+
+  // Confirmation Flow for Mark Used
+  function promptMarkUsed(drawNum, rank, isUsed) {
+    const t = allTickets.find(x => (x.drawNumber || 1) === drawNum && x.drawRank === rank);
+    if (!t) return;
+
+    openDetail(drawNum, rank);
+    // Show confirm box in modal
+    const confirmBox = $('m-confirm-box');
+    const actions = $('m-actions');
+    confirmBox.style.display = 'block';
+    actions.style.display = 'none';
+
+    if (isUsed) {
+      $('confirm-title').textContent = 'تأكيد استعمال التذكرة';
+      $('confirm-title').style.color = 'var(--purple)';
+      $('confirm-desc').innerHTML = `هل أنت متأكد من تأكيد استعمال تذكرة <b>${t.winnerName}</b> (سحب ${drawNum} - ترتيب #${rank})؟<br><span style="color:var(--text-dim);font-size:11px;">سيتم نقلها مباشرة لقائمة المستعملة ولن تظهر في التذاكر المتاحة.</span>`;
+      $('confirm-yes-btn').textContent = '✔️ نعم، تم الاستعمال';
+      $('confirm-yes-btn').className = 'btn-use-modal';
+    } else {
+      $('confirm-title').textContent = 'استرجاع التذكرة للمتاحة';
+      $('confirm-title').style.color = 'var(--accent)';
+      $('confirm-desc').innerHTML = `هل ترغب بإلغاء وسم التذكرة كمستعملة وإعادتها لقائمة <b>التذاكر المتاحة</b>؟`;
+      $('confirm-yes-btn').textContent = '↩️ نعم، إرجاع للمتاحة';
+      $('confirm-yes-btn').className = 'btn-restore-modal';
+    }
+
+    $('confirm-yes-btn').onclick = async () => {
+      confirmBox.style.display = 'none';
+      actions.style.display = 'flex';
+      modal.classList.remove('open');
+
+      t.isUsed = isUsed;
+      t.usedAt = isUsed ? new Date().toISOString() : null;
+
+      await saveMarkUsed(drawNum, rank, isUsed, t.mobile, t.winnerName);
+      updateStatsAndBadges();
+      renderMainCards();
+
+      showToast(isUsed ? `تم استعمال تذكرة #${rank} (${t.winnerName}) ونقلها للمستعملة ✅` : `تمت إعادة تذكرة #${rank} للقائمة المتاحة بنجاح ↩️`, true);
+    };
+
+    $('confirm-no-btn').onclick = () => {
+      confirmBox.style.display = 'none';
+      actions.style.display = 'flex';
+    };
+  }
+
+  function downloadPdf(filename) {
+    const a = document.createElement('a');
+    a.href = './tickets/' + encodeURIComponent(filename);
+    a.download = filename;
+    a.click();
+  }
+
+  // Open Full Detail Modal
+  function openDetail(drawNum, rank) {
+    const t = allTickets.find(x => (x.drawNumber || 1) === drawNum && x.drawRank === rank);
+    if (!t) return;
+
+    activeModalTicket = t;
+    $('m-confirm-box').style.display = 'none';
+    $('m-actions').style.display = 'flex';
+
+    $('m-rank').textContent = '#' + t.drawRank;
+    if (t.isUsed) {
+      $('m-rank').style.background = 'var(--purple-bg)';
+      $('m-rank').style.color = 'var(--purple)';
+      $('m-rank').style.borderColor = 'var(--purple-border)';
+      $('m-sub').textContent = 'تذكرة مستعملة ومؤرشفة محلياً ✔️';
+    } else if (t.hasTicket) {
+      $('m-rank').style.background = 'var(--green-bg)';
+      $('m-rank').style.color = 'var(--green)';
+      $('m-rank').style.borderColor = 'var(--green-border)';
+      $('m-sub').textContent = 'تذكرة مستلمة ومتاحة للاستخدام ✅';
+    } else {
+      $('m-rank').style.background = 'var(--amber-bg)';
+      $('m-rank').style.color = 'var(--amber)';
+      $('m-rank').style.borderColor = 'var(--amber-border)';
+      $('m-sub').textContent = t.drawNumber === 2 ? 'في انتظار إرسال التذكرة (السحب الثاني) ⏳' : 'في انتظار إرسال التذكرة (السحب الأول) ⏳';
+    }
+
+    $('m-name').textContent = t.winnerName;
+
+    const meta = t.ticketMetadata || {};
+    const items = [
+      ['رقم السحب', t.drawNumber === 2 ? 'السحب الثاني (01 أكتوبر 2026)' : 'السحب الأول (01 سبتمبر 2026)'],
+      ['الترتيب في السحب', '#' + t.drawRank],
+      ['حالة التذكرة', t.isUsed ? 'مستعملة ✔️' : (t.hasTicket ? 'مستلمة وجاهزة ✅' : 'معلقة بانتظار الإرسال ⏳')],
+      ['رقم الجوال', t.mobile],
+      ['المدينة', t.city],
+      ['البريد الإلكتروني', t.email],
+      ['رقم الإيصال', t.receiptNumber],
+      ['الجائزة', t.prize || 'تذكرة الى مدينة القدية في الرياض'],
+    ];
+
+    if (t.usedAt) {
+      items.push(['تاريخ الاستعمال', new Date(t.usedAt).toLocaleString('ar-SA')]);
+    }
+
+    if (t.hasTicket && meta.bookingId) {
+      items.push(
+        ['رقم الحجز (Booking ID)', meta.bookingId],
+        ['كود التذكرة (QR)', meta.ticketCode],
+        ['صالحة من', meta.validFrom],
+        ['صالحة حتى', meta.validTo],
+        ['تاريخ الشراء', meta.purchaseDate],
+        ['نوع التذكرة', meta.ticketType || 'Single Day Park Ticket'],
+      );
+    }
+
+    if (t.emailSubject) items.push(['عنوان الرسالة', t.emailSubject]);
+    if (t.emailReceivedAt) items.push(['تاريخ الاستلام', new Date(t.emailReceivedAt).toLocaleString('ar-SA')]);
+    if (t.pdfSize) items.push(['حجم الملف', (t.pdfSize / 1024).toFixed(0) + ' KB']);
+
+    $('m-details').innerHTML = items.map(pair => {
+      const full = pair[1] && pair[1].length > 30 ? ' full' : '';
+      return `<div class="detail-item${full}"><label>${pair[0]}</label><value>${pair[1] || '—'}</value></div>`;
+    }).join('');
+
+    // Actions
+    const dlBtn = $('m-download');
+    const useBtn = $('m-use-btn');
+    const restoreBtn = $('m-restore-btn');
+
+    if (t.hasTicket && t.pdfFileName) {
+      dlBtn.style.display = '';
+      dlBtn.onclick = () => downloadPdf(t.pdfFileName);
+    } else {
+      dlBtn.style.display = 'none';
+    }
+
+    if (t.hasTicket && !t.isUsed) {
+      useBtn.style.display = '';
+      restoreBtn.style.display = 'none';
+      useBtn.onclick = () => promptMarkUsed(drawNum, rank, true);
+    } else if (t.isUsed) {
+      useBtn.style.display = 'none';
+      restoreBtn.style.display = '';
+      restoreBtn.onclick = () => promptMarkUsed(drawNum, rank, false);
+    } else {
+      useBtn.style.display = 'none';
+      restoreBtn.style.display = 'none';
+    }
+
+    modal.classList.add('open');
+  }
+
+  // Close Modals
+  $('m-close').addEventListener('click', () => modal.classList.remove('open'));
+  modal.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+
+  // Drawer Controls
+  const openDrawer = () => {
+    drawerOverlay.classList.add('open');
+    renderDrawerCards();
+  };
+  const closeDrawer = () => drawerOverlay.classList.remove('open');
+
+  $('open-drawer-btn').addEventListener('click', openDrawer);
+  $('stat-pend-box').addEventListener('click', openDrawer);
+  $('drawer-close-btn').addEventListener('click', closeDrawer);
+  drawerOverlay.addEventListener('click', function(e) {
+    if (e.target === this) closeDrawer();
+  });
+
+  // View Tabs Switcher (المتاحة vs المستعملة)
+  $('tab-available-btn').addEventListener('click', function() {
+    currentView = 'available';
+    this.classList.add('active');
+    $('tab-used-btn').classList.remove('active');
+    updateStatsAndBadges();
+    renderMainCards();
+  });
+
+  $('tab-used-btn').addEventListener('click', function() {
+    currentView = 'used';
+    this.classList.add('active');
+    $('tab-available-btn').classList.remove('active');
+    updateStatsAndBadges();
+    renderMainCards();
+  });
+
+  $('stat-avail-box').addEventListener('click', () => $('tab-available-btn').click());
+  $('stat-used-box').addEventListener('click', () => $('tab-used-btn').click());
+
+  // Search Main
+  let searchTimeout;
+  searchInput.addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      searchQuery = this.value.trim();
+      renderMainCards();
+    }, 180);
+  });
+
+  // Search Drawer
+  let drawerSearchTimeout;
+  $('drawer-search').addEventListener('input', function() {
+    clearTimeout(drawerSearchTimeout);
+    drawerSearchTimeout = setTimeout(() => {
+      drawerSearchQuery = this.value.trim();
+      renderDrawerCards();
+    }, 180);
+  });
+
+  // Main Filters
+  $('filters').addEventListener('click', function(e) {
+    const pill = e.target.closest('.filter-pill');
+    if (!pill) return;
+    this.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    currentFilter = pill.dataset.filter;
+    renderMainCards();
+  });
+
+  // Drawer Filters
+  $('drawer-filters').addEventListener('click', function(e) {
+    const pill = e.target.closest('.filter-pill');
+    if (!pill) return;
+    this.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    drawerFilter = pill.dataset.dfilter;
+    renderDrawerCards();
+  });
+
+  // Scroll to top
+  const scrollBtn = $('scroll-top');
+  window.addEventListener('scroll', () => {
+    scrollBtn.classList.toggle('show', window.scrollY > 300);
+  });
+  scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // Initial Load
+  loadData();
+})();
+</script>
+</body>
+</html>
