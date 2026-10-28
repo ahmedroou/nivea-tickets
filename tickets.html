@@ -17,7 +17,7 @@
       --accent: #3b82f6; --accent-hover: #60a5fa; --accent-bg: rgba(59,130,246,.08);
       --green: #22c55e; --green-bg: rgba(34,197,94,.1); --green-border: rgba(34,197,94,.25);
       --amber: #f59e0b; --amber-bg: rgba(245,158,11,.1); --amber-border: rgba(245,158,11,.25);
-      --purple: #a855f7; --purple-bg: rgba(168,85,247,.1); --purple-border: rgba(168,85,247,.25);
+      --purple: #a855f7; --purple-bg: rgba(168,85,247,.12); --purple-border: rgba(168,85,247,.3);
       --red: #ef4444; --red-bg: rgba(239,68,68,.1);
       --radius: 10px; --radius-sm: 6px;
       --shadow: 0 1px 3px rgba(0,0,0,.3), 0 4px 12px rgba(0,0,0,.2);
@@ -59,9 +59,7 @@
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(1.3); } }
 
     /* Navigation View Tabs (المتاحة vs المستعملة) */
-    .view-tabs-container {
-      padding: 8px 12px 4px;
-    }
+    .view-tabs-container { padding: 8px 12px 4px; }
     .view-tabs {
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); padding: 3px; display: flex; gap: 4px;
@@ -99,7 +97,7 @@
     .stat-box.pending strong { color: var(--amber); }
     .stat-box span { font-size: 10px; color: var(--text-muted); font-weight: 700; white-space: nowrap; }
 
-    /* Search */
+    /* Search Bar */
     .search-bar {
       padding: 6px 12px; position: sticky; top: 51px; z-index: 50;
       background: var(--bg);
@@ -118,9 +116,15 @@
     }
     .search-bar .search-icon svg { width: 15px; height: 15px; }
 
-    /* Filters */
-    .filters { display: flex; gap: 6px; padding: 2px 12px 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .filters::-webkit-scrollbar { display: none; }
+    /* Filters & Sort Strip */
+    .controls-strip {
+      padding: 2px 12px 8px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .filters, .sort-row {
+      display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    }
+    .filters::-webkit-scrollbar, .sort-row::-webkit-scrollbar { display: none; }
+
     .filter-pill {
       border: 1px solid var(--border); background: var(--card); color: var(--text-muted);
       border-radius: 99px; padding: 4px 10px; font-size: 11px; font-weight: 700;
@@ -130,23 +134,39 @@
     .filter-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
     .filter-pill b { font-weight: 800; margin-right: 3px; }
 
+    .sort-pill {
+      border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--text-muted);
+      border-radius: 99px; padding: 3px 9px; font-size: 10.5px; font-weight: 700;
+      font-family: var(--font); cursor: pointer; white-space: nowrap; transition: all .2s;
+    }
+    .sort-pill.active { background: var(--card-hover); color: var(--accent-hover); border-color: var(--accent); }
+
     /* Ticket Cards Grid (Compact & Mobile First) */
     .cards { padding: 0 12px 16px; display: flex; flex-direction: column; gap: 6px; }
 
     .ticket-card {
       background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 9px 10px; display: flex; align-items: center; gap: 8px;
-      cursor: pointer; transition: background .15s, border-color .15s, transform .2s, opacity .2s;
+      padding: 8px 10px; display: flex; align-items: center; gap: 8px;
+      cursor: pointer; transition: background .15s, border-color .15s, transform .2s, opacity .25s;
       position: relative;
     }
     .ticket-card:active, .ticket-card:hover { background: var(--card-hover); border-color: var(--border-light); }
     .ticket-card.available { border-right: 3px solid var(--green); }
-    .ticket-card.used-card { border-right: 3px solid var(--purple); opacity: .85; }
+    .ticket-card.used-card { border-right: 3px solid var(--purple); opacity: .88; }
     .ticket-card.pending-card { border-right: 3px solid var(--amber); }
 
+    /* Sequential number badge (1, 2, 3...) */
+    .serial-badge {
+      width: 24px; height: 24px; border-radius: var(--radius-sm);
+      background: rgba(255,255,255,.06); border: 1px solid var(--border-light);
+      color: var(--text-dim); font-size: 11px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    /* Draw rank badge (#88) */
     .ticket-card .rank-badge {
       width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 800; flex-shrink: 0;
+      font-size: 10.5px; font-weight: 800; flex-shrink: 0;
     }
     .ticket-card.available .rank-badge { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
     .ticket-card.used-card .rank-badge { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
@@ -165,29 +185,36 @@
       background: rgba(59,130,246,.12); color: var(--accent); font-weight: 800; white-space: nowrap;
     }
 
-    /* Actions in Card */
-    .ticket-card .card-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .downloaded-tag {
+      font-size: 8.5px; padding: 1px 5px; border-radius: 3px;
+      background: rgba(34,197,94,.15); color: var(--green); font-weight: 800; border: 1px solid var(--green-border);
+      display: inline-flex; align-items: center; gap: 2px;
+    }
 
-    .btn-use-ticket {
+    /* Actions in Card */
+    .ticket-card .card-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+
+    /* Quick Use Button (Single-tap, no confirm modal) */
+    .btn-quick-use {
       background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border);
       font-size: 10.5px; font-weight: 800; font-family: var(--font);
-      padding: 5px 8px; border-radius: var(--radius-sm); cursor: pointer;
+      padding: 5px 9px; border-radius: var(--radius-sm); cursor: pointer;
       display: flex; align-items: center; gap: 4px; white-space: nowrap;
       transition: all .15s;
     }
-    .btn-use-ticket:hover, .btn-use-ticket:active {
-      background: var(--purple); color: #fff;
+    .btn-quick-use:active {
+      transform: scale(.93); background: var(--purple); color: #fff;
     }
 
-    .btn-restore-ticket {
+    .btn-quick-restore {
       background: rgba(59,130,246,.1); color: var(--accent); border: 1px solid rgba(59,130,246,.25);
       font-size: 10.5px; font-weight: 800; font-family: var(--font);
-      padding: 5px 8px; border-radius: var(--radius-sm); cursor: pointer;
+      padding: 5px 9px; border-radius: var(--radius-sm); cursor: pointer;
       display: flex; align-items: center; gap: 4px; white-space: nowrap;
       transition: all .15s;
     }
-    .btn-restore-ticket:hover, .btn-restore-ticket:active {
-      background: var(--accent); color: #fff;
+    .btn-quick-restore:active {
+      transform: scale(.93); background: var(--accent); color: #fff;
     }
 
     .dl-btn {
@@ -196,7 +223,10 @@
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; transition: all .15s; flex-shrink: 0;
     }
-    .dl-btn:hover, .dl-btn:active { background: var(--green); color: #fff; }
+    .dl-btn:active { transform: scale(.9); background: var(--green); color: #fff; }
+    .dl-btn.downloaded {
+      background: rgba(34,197,94,.25); border-color: var(--green);
+    }
     .dl-btn svg { width: 13px; height: 13px; }
 
     /* Side Drawer for Pending Tickets (القائمة الجانبية) */
@@ -241,7 +271,7 @@
       display: flex; flex-direction: column; gap: 6px; -webkit-overflow-scrolling: touch;
     }
 
-    /* Detail Modal & Confirmation Modal */
+    /* Detail Modal & Confirmation Sheet */
     .modal-overlay {
       position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,.75);
       backdrop-filter: blur(4px); display: none; align-items: flex-end; justify-content: center;
@@ -287,23 +317,44 @@
     .btn-restore-modal { background: var(--accent); color: #fff; }
     .btn-close { background: var(--card); color: var(--text-muted); border: 1px solid var(--border) !important; }
 
-    /* Confirm Dialog */
-    .confirm-dialog {
-      background: var(--card); border: 1px solid var(--border-light); border-radius: var(--radius);
-      padding: 16px; margin: 10px 0; text-align: center;
+    /* Re-download Confirmation Dialog */
+    .dl-confirm-overlay {
+      position: fixed; inset: 0; z-index: 350; background: rgba(0,0,0,.75);
+      backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 16px;
     }
-    .confirm-dialog h3 { font-size: 14px; font-weight: 800; margin-bottom: 6px; color: var(--purple); }
-    .confirm-dialog p { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
+    .dl-confirm-overlay.open { display: flex; }
+    .dl-confirm-card {
+      background: var(--surface); border: 1px solid var(--amber-border); border-radius: 14px;
+      width: 100%; max-width: 380px; padding: 20px 18px; text-align: center;
+      animation: popIn .2s ease-out; box-shadow: 0 10px 30px rgba(0,0,0,.5);
+    }
+    @keyframes popIn { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .dl-confirm-icon { font-size: 34px; margin-bottom: 8px; line-height: 1; }
+    .dl-confirm-title { font-size: 15px; font-weight: 800; color: var(--amber); margin-bottom: 6px; }
+    .dl-confirm-body { font-size: 12px; color: var(--text-muted); line-height: 1.55; margin-bottom: 16px; }
+    .dl-confirm-actions { display: flex; gap: 8px; }
+    .dl-confirm-actions button {
+      flex: 1; padding: 9px; border-radius: var(--radius-sm); border: none;
+      font-size: 12px; font-weight: 700; font-family: var(--font); cursor: pointer;
+    }
+    .btn-dl-confirm-yes { background: var(--green); color: #fff; }
+    .btn-dl-confirm-no { background: var(--card); color: var(--text); border: 1px solid var(--border) !important; }
 
-    /* Toast Notification */
+    /* Toast Notification (With Undo button) */
     .toast {
       position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-20px);
-      background: var(--surface); border: 1px solid var(--green-border); color: #fff;
-      padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 700;
-      box-shadow: 0 4px 16px rgba(0,0,0,.5); z-index: 400; opacity: 0; pointer-events: none;
-      transition: all .25s ease; display: flex; align-items: center; gap: 6px;
+      background: #152238; border: 1px solid var(--green-border); color: #fff;
+      padding: 8px 14px; border-radius: 99px; font-size: 12px; font-weight: 700;
+      box-shadow: 0 4px 18px rgba(0,0,0,.55); z-index: 400; opacity: 0; pointer-events: none;
+      transition: all .25s ease; display: flex; align-items: center; gap: 8px;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .toast-undo-btn {
+      background: var(--purple); color: #fff; border: none; padding: 3px 9px;
+      border-radius: 99px; font-size: 10.5px; font-weight: 800; cursor: pointer;
+      font-family: var(--font);
+    }
+    .toast-undo-btn:active { transform: scale(.92); }
 
     /* Empty State */
     .empty { text-align: center; padding: 36px 16px; color: var(--text-dim); }
@@ -326,7 +377,7 @@
 
     /* Desktop constraint */
     @media (min-width: 600px) {
-      .top-bar, .view-tabs-container, .stats, .search-bar, .filters, .cards {
+      .top-bar, .view-tabs-container, .stats, .search-bar, .controls-strip, .cards {
         max-width: 520px; margin-left: auto; margin-right: auto;
       }
       .side-drawer { border-left: 1px solid var(--border); }
@@ -387,11 +438,18 @@
     <input type="search" id="search" placeholder="ابحث بالاسم أو الجوال أو رقم السحب أو المدينة...">
   </div>
 
-  <!-- Filters -->
-  <div class="filters" id="filters">
-    <button class="filter-pill active" data-filter="all">الكل <b id="f-all">—</b></button>
-    <button class="filter-pill" data-filter="draw1">السحب 1 <b id="f-d1">—</b></button>
-    <button class="filter-pill" data-filter="draw2">السحب 2 <b id="f-d2">—</b></button>
+  <!-- Controls Strip (Filters & Sort) -->
+  <div class="controls-strip">
+    <div class="filters" id="filters">
+      <button class="filter-pill active" data-filter="all">الكل <b id="f-all">—</b></button>
+      <button class="filter-pill" data-filter="draw1">السحب 1 <b id="f-d1">—</b></button>
+      <button class="filter-pill" data-filter="draw2">السحب 2 <b id="f-d2">—</b></button>
+    </div>
+    <div class="sort-row" id="sort-controls">
+      <span style="font-size:10.5px;color:var(--text-dim);font-weight:700;display:flex;align-items:center;">ترتيب:</span>
+      <button class="sort-pill active" data-sort="alphabetical">🔤 أبجدي (أ - ي)</button>
+      <button class="sort-pill" data-sort="rank">🔢 رقم السحب (#)</button>
+    </div>
   </div>
 
   <!-- Main Cards Container (المتاحة والمستعملة فقط - لا توجد معلقة هنا) -->
@@ -421,6 +479,22 @@
     </div>
   </div>
 
+  <!-- Re-Download Confirmation Modal -->
+  <div class="dl-confirm-overlay" id="dl-confirm-overlay">
+    <div class="dl-confirm-card">
+      <div class="dl-confirm-icon">⚠️</div>
+      <div class="dl-confirm-title">تم تحميل التذكرة مسبقاً!</div>
+      <div class="dl-confirm-body" id="dl-confirm-body">
+        لقد قمت بتحميل ملف هذه التذكرة سابقاً على هذا الجهاز.<br>
+        هل أنت متأكد من رغبتك في إعادة تحميلها؟
+      </div>
+      <div class="dl-confirm-actions">
+        <button class="btn-dl-confirm-yes" id="btn-dl-confirm-yes">إعادة التحميل 📥</button>
+        <button class="btn-dl-confirm-no" id="btn-dl-confirm-no">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Detail Modal Sheet -->
   <div class="modal-overlay" id="modal">
     <div class="modal-sheet" id="modal-sheet">
@@ -434,16 +508,6 @@
       </div>
       <div class="detail-grid" id="m-details"></div>
 
-      <!-- Confirmation Box inside modal -->
-      <div class="confirm-dialog" id="m-confirm-box" style="display:none;">
-        <h3 id="confirm-title">تأكيد الاستخدام</h3>
-        <p id="confirm-desc">هل أنت متأكد من تأكيد استعمال هذه التذكرة؟ سيتم نقلها مباشرة لقائمة المستعملة ولن تظهر في القائمة المتاحة.</p>
-        <div style="display:flex;gap:6px;">
-          <button class="btn-use-modal" id="confirm-yes-btn">✔️ نعم، تأكيد الاستعمال</button>
-          <button class="btn-close" id="confirm-no-btn">إلغاء</button>
-        </div>
-      </div>
-
       <div class="modal-actions" id="m-actions">
         <div class="action-row">
           <button class="btn-download-modal" id="m-download" style="display:none">
@@ -451,10 +515,10 @@
             تحميل PDF
           </button>
           <button class="btn-use-modal" id="m-use-btn" style="display:none">
-            ✔️ تم الاستعمال
+            استعمال سريع ✔️
           </button>
           <button class="btn-restore-modal" id="m-restore-btn" style="display:none">
-            ↩️ استرجاع للمتاحة
+            استرجاع للمتاحة ↩️
           </button>
         </div>
         <button class="btn-close" id="m-close">إغلاق</button>
@@ -462,8 +526,11 @@
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div class="toast" id="toast"></div>
+  <!-- Toast Notification (With Undo) -->
+  <div class="toast" id="toast">
+    <span id="toast-text"></span>
+    <button class="toast-undo-btn" id="toast-undo" style="display:none;">تراجع ↩️</button>
+  </div>
 
   <!-- Scroll to top -->
   <button class="scroll-top" id="scroll-top" aria-label="أعلى الصفحة">
@@ -477,12 +544,14 @@
   // State
   let allTickets = [];
   let usedTicketsMap = new Map(); // key: `${drawNumber}_${drawRank}` -> usedInfo
-  let currentView = 'available'; // 'available' | 'used'
-  let currentFilter = 'all'; // 'all' | 'draw1' | 'draw2'
+  let downloadedSet = new Set();  // Set of filenames that were already downloaded
+  let currentView = 'available';  // 'available' | 'used'
+  let currentFilter = 'all';      // 'all' | 'draw1' | 'draw2'
+  let currentSort = 'alphabetical'; // 'alphabetical' | 'rank'
   let searchQuery = '';
   let drawerFilter = 'all';
   let drawerSearchQuery = '';
-  let activeModalTicket = null;
+  let lastQuickAction = null; // for undo
 
   const $ = id => document.getElementById(id);
   const container = $('cards-container');
@@ -491,12 +560,47 @@
   const drawerOverlay = $('drawer-overlay');
   const drawerCards = $('drawer-cards');
   const toast = $('toast');
+  const toastText = $('toast-text');
+  const toastUndo = $('toast-undo');
+  const dlConfirmOverlay = $('dl-confirm-overlay');
+  const dlConfirmBody = $('dl-confirm-body');
+  const dlConfirmYes = $('btn-dl-confirm-yes');
+  const dlConfirmNo = $('btn-dl-confirm-no');
 
-  function showToast(msg, isSuccess = true) {
-    toast.textContent = msg;
-    toast.style.borderColor = isSuccess ? 'var(--green-border)' : 'var(--amber-border)';
+  let pendingDownloadFilename = null;
+
+  function showToast(msg, canUndo = false, undoCallback = null) {
+    toastText.textContent = msg;
+    if (canUndo && undoCallback) {
+      toastUndo.style.display = 'inline-block';
+      toastUndo.onclick = () => {
+        toast.classList.remove('show');
+        undoCallback();
+      };
+    } else {
+      toastUndo.style.display = 'none';
+    }
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2800);
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => toast.classList.remove('show'), 3800);
+  }
+
+  // Load downloaded tracking
+  function loadDownloadedTracking() {
+    try {
+      const cached = localStorage.getItem('batabitoo_downloaded_tickets');
+      if (cached) {
+        const list = JSON.parse(cached);
+        list.forEach(f => downloadedSet.add(f));
+      }
+    } catch (_) {}
+  }
+
+  function recordDownloaded(filename) {
+    downloadedSet.add(filename);
+    try {
+      localStorage.setItem('batabitoo_downloaded_tickets', JSON.stringify(Array.from(downloadedSet)));
+    } catch (_) {}
   }
 
   // Load used tickets from local database API + localStorage fallback
@@ -510,9 +614,9 @@
       }
     } catch (_) {}
 
-    // 2. Server API fetch
+    // 2. Server API fetch (if available)
     try {
-      const res = await fetch('/api/tickets/used?t=' + Date.now());
+      const res = await fetch('./api/tickets/used?t=' + Date.now());
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.usedTickets)) {
@@ -539,23 +643,20 @@
       localStorage.setItem('batabitoo_used_tickets', JSON.stringify(list));
     } catch (_) {}
 
-    // Save to Server Database
+    // Save to Server Database API
     try {
-      const res = await fetch('/api/tickets/mark-used', {
+      await fetch('./api/tickets/mark-used', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ drawNumber, drawRank, isUsed, mobile, winnerName })
       });
-      return res.ok;
-    } catch (e) {
-      console.warn('Server sync error:', e);
-      return false;
-    }
+    } catch (_) {}
   }
 
   // Load all tickets data
   async function loadData() {
     try {
+      loadDownloadedTracking();
       await loadUsedTickets();
 
       const res = await fetch('./tickets_data.json?t=' + Date.now());
@@ -595,7 +696,7 @@
     $('tab-avail-count').textContent = availableTickets.length;
     $('tab-used-count').textContent = usedTickets.length;
 
-    // Main filter counters based on current active view
+    // Main filter counters
     const activePool = currentView === 'available' ? availableTickets : usedTickets;
     $('f-all').textContent = activePool.length;
     $('f-d1').textContent = activePool.filter(t => (t.drawNumber || 1) === 1).length;
@@ -630,6 +731,14 @@
         (t.ticketMetadata?.ticketCode || '').toLowerCase().includes(q)
       );
     }
+
+    // Apply Sorting
+    if (currentSort === 'alphabetical') {
+      list.sort((a, b) => (a.winnerName || '').localeCompare(b.winnerName || '', 'ar'));
+    } else {
+      list.sort((a, b) => (a.drawRank || 0) - (b.drawRank || 0));
+    }
+
     return list;
   }
 
@@ -644,7 +753,7 @@
               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             <h3>لا توجد تذاكر مستعملة بعد</h3>
-            <p>عندما تضغط "استعمال" على أي تذكرة في القائمة المتاحة، ستنتقل إلى هنا لحفظها.</p>
+            <p>عند الضغط على "استعمال ✔️" لأي تذكرة، ستنتقل إلى هنا فوراً.</p>
           </div>`;
       } else {
         container.innerHTML = `
@@ -661,19 +770,23 @@
 
     const dlIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>';
 
-    container.innerHTML = list.map(t => {
+    container.innerHTML = list.map((t, index) => {
+      const serialNum = index + 1; // 1, 2, 3...
       const drawNum = t.drawNumber || 1;
       const isUsed = !!t.isUsed;
       const cls = isUsed ? 'used-card' : 'available';
       const meta = t.ticketMetadata;
       const code = meta?.ticketCode ? meta.ticketCode.slice(0, 8) + '…' : '';
+      const isDownloaded = t.pdfFileName && downloadedSet.has(t.pdfFileName);
 
       return `<div class="ticket-card ${cls}" id="card-${drawNum}-${t.drawRank}" data-draw="${drawNum}" data-rank="${t.drawRank}">
-        <div class="rank-badge">#${t.drawRank}</div>
+        <div class="serial-badge" title="الترتيب التسلسلي">${serialNum}</div>
+        <div class="rank-badge" title="رقم السحب">#${t.drawRank}</div>
         <div class="info">
           <div class="name">
             <span>${t.winnerName || '—'}</span>
             <span class="draw-badge">سحب ${drawNum}</span>
+            ${isDownloaded ? '<span class="downloaded-tag" title="تم تنزيل ملف التذكرة مسبقاً">محملة 📥</span>' : ''}
             ${isUsed ? '<span style="font-size:9.5px;color:var(--purple);font-weight:800;background:var(--purple-bg);padding:1px 5px;border-radius:3px;">مستعملة</span>' : ''}
           </div>
           <div class="meta">
@@ -683,19 +796,19 @@
           </div>
         </div>
         <div class="card-actions">
-          ${t.pdfFileName ? `<button class="dl-btn" data-pdf="${t.pdfFileName}" title="تحميل PDF">${dlIcon}</button>` : ''}
+          ${t.pdfFileName ? `<button class="dl-btn ${isDownloaded ? 'downloaded' : ''}" data-pdf="${t.pdfFileName}" data-name="${t.winnerName || ''}" title="${isDownloaded ? 'تم تحميلها مسبقاً (انقر للتحميل)' : 'تحميل PDF'}">${dlIcon}</button>` : ''}
           ${!isUsed ?
-            `<button class="btn-use-ticket" data-draw="${drawNum}" data-rank="${t.drawRank}" title="تأكيد استعمال التذكرة">استعمال ✔️</button>` :
-            `<button class="btn-restore-ticket" data-draw="${drawNum}" data-rank="${t.drawRank}" title="استرجاع للمتاحة">استرجاع ↩️</button>`
+            `<button class="btn-quick-use" data-draw="${drawNum}" data-rank="${t.drawRank}" title="استعمال سريع بنقرة واحدة">استعمال ✔️</button>` :
+            `<button class="btn-quick-restore" data-draw="${drawNum}" data-rank="${t.drawRank}" title="إرجاع للمتاحة">استرجاع ↩️</button>`
           }
         </div>
       </div>`;
     }).join('');
 
-    // Attach card click
+    // Attach card click for details
     container.querySelectorAll('.ticket-card').forEach(card => {
       card.addEventListener('click', function(e) {
-        if (e.target.closest('.dl-btn') || e.target.closest('.btn-use-ticket') || e.target.closest('.btn-restore-ticket')) return;
+        if (e.target.closest('.dl-btn') || e.target.closest('.btn-quick-use') || e.target.closest('.btn-quick-restore')) return;
         const rank = parseInt(this.dataset.rank);
         const drawNum = parseInt(this.dataset.draw) || 1;
         openDetail(drawNum, rank);
@@ -706,30 +819,110 @@
     container.querySelectorAll('.dl-btn').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
-        downloadPdf(this.dataset.pdf);
+        triggerDownloadFlow(this.dataset.pdf, this.dataset.name);
       });
     });
 
-    // Attach "استعمال" Button
-    container.querySelectorAll('.btn-use-ticket').forEach(btn => {
+    // Attach Quick "استعمال" Button (Single-tap immediate action, no confirm modal)
+    container.querySelectorAll('.btn-quick-use').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
         const rank = parseInt(this.dataset.rank);
         const drawNum = parseInt(this.dataset.draw) || 1;
-        promptMarkUsed(drawNum, rank, true);
+        quickMarkUsed(drawNum, rank, true);
       });
     });
 
-    // Attach "استرجاع" Button
-    container.querySelectorAll('.btn-restore-ticket').forEach(btn => {
+    // Attach Quick "استرجاع" Button
+    container.querySelectorAll('.btn-quick-restore').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
         const rank = parseInt(this.dataset.rank);
         const drawNum = parseInt(this.dataset.draw) || 1;
-        promptMarkUsed(drawNum, rank, false);
+        quickMarkUsed(drawNum, rank, false);
       });
     });
   }
+
+  // Quick Action for Mark Used (1-Tap Immediate, with Undo Toast)
+  function quickMarkUsed(drawNum, rank, isUsed) {
+    const t = allTickets.find(x => (x.drawNumber || 1) === drawNum && x.drawRank === rank);
+    if (!t) return;
+
+    // Animate card removal if in current view
+    const cardEl = $(`card-${drawNum}-${rank}`);
+    if (cardEl) {
+      cardEl.style.transform = 'translateX(-30px)';
+      cardEl.style.opacity = '0';
+    }
+
+    setTimeout(() => {
+      t.isUsed = isUsed;
+      t.usedAt = isUsed ? new Date().toISOString() : null;
+
+      saveMarkUsed(drawNum, rank, isUsed, t.mobile, t.winnerName);
+      updateStatsAndBadges();
+      renderMainCards();
+
+      if (isUsed) {
+        showToast(`تم استعمال تذكرة ${t.winnerName} بنجاح ✔️`, true, () => {
+          // Undo Callback
+          quickMarkUsed(drawNum, rank, false);
+        });
+      } else {
+        showToast(`تمت استعادة تذكرة ${t.winnerName} للمتاحة ↩️`, true, () => {
+          // Undo Callback
+          quickMarkUsed(drawNum, rank, true);
+        });
+      }
+    }, 180);
+  }
+
+  // Download Flow with Re-download Protection
+  function triggerDownloadFlow(filename, winnerName = '') {
+    if (!filename) return;
+
+    if (downloadedSet.has(filename)) {
+      // Show confirmation dialog: already downloaded
+      pendingDownloadFilename = filename;
+      dlConfirmBody.innerHTML = `لقد قمت بتحميل تذكرة <b>${winnerName}</b> مسبقاً على هذا الجهاز.<br><br>هل أنت متأكد من رغبتك في إعادة تحميلها؟`;
+      dlConfirmOverlay.classList.add('open');
+    } else {
+      executeDownload(filename);
+    }
+  }
+
+  function executeDownload(filename) {
+    recordDownloaded(filename);
+    const a = document.createElement('a');
+    a.href = './tickets/' + encodeURIComponent(filename);
+    a.download = filename;
+    a.click();
+
+    renderMainCards();
+    showToast('جاري بدء تحميل التذكرة 📥');
+  }
+
+  // Confirmation dialog buttons
+  dlConfirmYes.addEventListener('click', () => {
+    dlConfirmOverlay.classList.remove('open');
+    if (pendingDownloadFilename) {
+      executeDownload(pendingDownloadFilename);
+      pendingDownloadFilename = null;
+    }
+  });
+
+  dlConfirmNo.addEventListener('click', () => {
+    dlConfirmOverlay.classList.remove('open');
+    pendingDownloadFilename = null;
+  });
+
+  dlConfirmOverlay.addEventListener('click', function(e) {
+    if (e.target === this) {
+      this.classList.remove('open');
+      pendingDownloadFilename = null;
+    }
+  });
 
   // Filter pool for Drawer (Pending tickets only)
   function getDrawerFiltered() {
@@ -758,9 +951,10 @@
       return;
     }
 
-    drawerCards.innerHTML = list.map(t => {
+    drawerCards.innerHTML = list.map((t, index) => {
       const drawNum = t.drawNumber || 1;
       return `<div class="ticket-card pending-card" data-draw="${drawNum}" data-rank="${t.drawRank}">
+        <div class="serial-badge" title="الترتيب">${index + 1}</div>
         <div class="rank-badge">#${t.drawRank}</div>
         <div class="info">
           <div class="name">
@@ -788,68 +982,10 @@
     });
   }
 
-  // Confirmation Flow for Mark Used
-  function promptMarkUsed(drawNum, rank, isUsed) {
-    const t = allTickets.find(x => (x.drawNumber || 1) === drawNum && x.drawRank === rank);
-    if (!t) return;
-
-    openDetail(drawNum, rank);
-    // Show confirm box in modal
-    const confirmBox = $('m-confirm-box');
-    const actions = $('m-actions');
-    confirmBox.style.display = 'block';
-    actions.style.display = 'none';
-
-    if (isUsed) {
-      $('confirm-title').textContent = 'تأكيد استعمال التذكرة';
-      $('confirm-title').style.color = 'var(--purple)';
-      $('confirm-desc').innerHTML = `هل أنت متأكد من تأكيد استعمال تذكرة <b>${t.winnerName}</b> (سحب ${drawNum} - ترتيب #${rank})؟<br><span style="color:var(--text-dim);font-size:11px;">سيتم نقلها مباشرة لقائمة المستعملة ولن تظهر في التذاكر المتاحة.</span>`;
-      $('confirm-yes-btn').textContent = '✔️ نعم، تم الاستعمال';
-      $('confirm-yes-btn').className = 'btn-use-modal';
-    } else {
-      $('confirm-title').textContent = 'استرجاع التذكرة للمتاحة';
-      $('confirm-title').style.color = 'var(--accent)';
-      $('confirm-desc').innerHTML = `هل ترغب بإلغاء وسم التذكرة كمستعملة وإعادتها لقائمة <b>التذاكر المتاحة</b>؟`;
-      $('confirm-yes-btn').textContent = '↩️ نعم، إرجاع للمتاحة';
-      $('confirm-yes-btn').className = 'btn-restore-modal';
-    }
-
-    $('confirm-yes-btn').onclick = async () => {
-      confirmBox.style.display = 'none';
-      actions.style.display = 'flex';
-      modal.classList.remove('open');
-
-      t.isUsed = isUsed;
-      t.usedAt = isUsed ? new Date().toISOString() : null;
-
-      await saveMarkUsed(drawNum, rank, isUsed, t.mobile, t.winnerName);
-      updateStatsAndBadges();
-      renderMainCards();
-
-      showToast(isUsed ? `تم استعمال تذكرة #${rank} (${t.winnerName}) ونقلها للمستعملة ✅` : `تمت إعادة تذكرة #${rank} للقائمة المتاحة بنجاح ↩️`, true);
-    };
-
-    $('confirm-no-btn').onclick = () => {
-      confirmBox.style.display = 'none';
-      actions.style.display = 'flex';
-    };
-  }
-
-  function downloadPdf(filename) {
-    const a = document.createElement('a');
-    a.href = './tickets/' + encodeURIComponent(filename);
-    a.download = filename;
-    a.click();
-  }
-
   // Open Full Detail Modal
   function openDetail(drawNum, rank) {
     const t = allTickets.find(x => (x.drawNumber || 1) === drawNum && x.drawRank === rank);
     if (!t) return;
-
-    activeModalTicket = t;
-    $('m-confirm-box').style.display = 'none';
-    $('m-actions').style.display = 'flex';
 
     $('m-rank').textContent = '#' + t.drawRank;
     if (t.isUsed) {
@@ -876,6 +1012,7 @@
       ['رقم السحب', t.drawNumber === 2 ? 'السحب الثاني (01 أكتوبر 2026)' : 'السحب الأول (01 سبتمبر 2026)'],
       ['الترتيب في السحب', '#' + t.drawRank],
       ['حالة التذكرة', t.isUsed ? 'مستعملة ✔️' : (t.hasTicket ? 'مستلمة وجاهزة ✅' : 'معلقة بانتظار الإرسال ⏳')],
+      ['حالة التحميل', (t.pdfFileName && downloadedSet.has(t.pdfFileName)) ? 'تم التحميل سابقاً 📥' : 'لم يتم التحميل بعد'],
       ['رقم الجوال', t.mobile],
       ['المدينة', t.city],
       ['البريد الإلكتروني', t.email],
@@ -914,7 +1051,7 @@
 
     if (t.hasTicket && t.pdfFileName) {
       dlBtn.style.display = '';
-      dlBtn.onclick = () => downloadPdf(t.pdfFileName);
+      dlBtn.onclick = () => triggerDownloadFlow(t.pdfFileName, t.winnerName);
     } else {
       dlBtn.style.display = 'none';
     }
@@ -922,11 +1059,17 @@
     if (t.hasTicket && !t.isUsed) {
       useBtn.style.display = '';
       restoreBtn.style.display = 'none';
-      useBtn.onclick = () => promptMarkUsed(drawNum, rank, true);
+      useBtn.onclick = () => {
+        modal.classList.remove('open');
+        quickMarkUsed(drawNum, rank, true);
+      };
     } else if (t.isUsed) {
       useBtn.style.display = 'none';
       restoreBtn.style.display = '';
-      restoreBtn.onclick = () => promptMarkUsed(drawNum, rank, false);
+      restoreBtn.onclick = () => {
+        modal.classList.remove('open');
+        quickMarkUsed(drawNum, rank, false);
+      };
     } else {
       useBtn.style.display = 'none';
       restoreBtn.style.display = 'none';
@@ -1002,6 +1145,16 @@
     this.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
     pill.classList.add('active');
     currentFilter = pill.dataset.filter;
+    renderMainCards();
+  });
+
+  // Sort Controls
+  $('sort-controls').addEventListener('click', function(e) {
+    const pill = e.target.closest('.sort-pill');
+    if (!pill) return;
+    this.querySelectorAll('.sort-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    currentSort = pill.dataset.sort;
     renderMainCards();
   });
 
